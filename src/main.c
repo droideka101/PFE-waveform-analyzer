@@ -4,7 +4,12 @@
 
 
 int main(void) {
-    printf("Hello, World!\n");
-    printf("git repo test\n");
+    char filePath[256];
+    printf("Waveform Analyzer start menu\n");
+    printf("enter the path to waveform file");
+    scanf("%255s", filePath);
+
+    read_waveform_from_file(filePath);
+
     return 0;
 }
