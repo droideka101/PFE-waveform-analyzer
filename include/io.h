@@ -16,6 +16,6 @@ typedef struct {
     float thd_percent;
 } WaveformSample;
 
-int read_waveform_from_file(const char* filePath);
+WaveformSample* read_waveform_from_file(const char* filePath);
 
 #endif //PROJECT_FILE_IO_H
