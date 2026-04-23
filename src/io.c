@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ROWS 1000
 
 WaveformSample* read_waveform_from_file(const char* filePath) {
 

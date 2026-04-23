@@ -5,6 +5,8 @@
 #ifndef PROJECT_FILE_IO_H
 #define PROJECT_FILE_IO_H
 
+#define MAX_ROWS 1000
+
 typedef struct {
     float timestamp;
     float phase_A_voltage;
