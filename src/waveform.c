@@ -9,92 +9,69 @@
 #include <math.h>
 
 
-double computePhaseRMS(WaveformSample *waveData, float *phaseFirstPtr) {
-    double root, mean, squareSum;
-    squareSum = 0;
+void calculateRMS(double sampleVoltage, PhaseOutputData *Phase, int rowNum) {
+    // printf("DEBUG: RowNum: %d  Sample Voltage: %lf\n", rowNum, sampleVoltage);
+    Phase->TotalSquared += sampleVoltage * sampleVoltage;
 
-    char *bytePtr = (char*)phaseFirstPtr;
-    size_t stride = sizeof(WaveformSample);
-
-    for (int i = 0; i < 1000; i++) {
-        float val = *(float*)bytePtr;
-        // printf("val = %f\n", val);      //console log for debugging
-        squareSum += val * val;
-        bytePtr += stride;
+    if (rowNum == MAX_ROWS) {
+        Phase->RMS = sqrt(Phase->TotalSquared / MAX_ROWS);
     }
-
-    mean = squareSum / MAX_ROWS;
-
-    root = sqrt(mean);
-
-    return root;
 }
 
-double calculatePeakToPeak(WaveformSample *waveData, float *phaseFirstPtr) {
-    double min, max, PTP = 0;
+void calculatePeakToPeak2(double sampleVoltage, PhaseOutputData *Phase, int rowNum) {
+    if (sampleVoltage > Phase->Max) Phase->Max = sampleVoltage;
+    if (sampleVoltage < Phase->Min) Phase->Min = sampleVoltage;
 
-    char *bytePtr = (char*)phaseFirstPtr;
-    size_t stride = sizeof(WaveformSample);
-
-    for (int i = 0; i < 1000; i++) {
-        float val = *(float*)bytePtr;
-
-        if (val < min) min = val;
-        if (val > max) max = val;
-
-        bytePtr += stride;
+    if (rowNum == MAX_ROWS) {
+        Phase->PTP = Phase->Max - Phase->Min;
     }
-    PTP = max - min;
-    return PTP;
 }
 
-AnalysisOutputData* AnalysePQ(WaveformSample *waveData) {
+WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
 
-    AnalysisOutputData *outputData = malloc(1 * sizeof(AnalysisOutputData));
-    if (!outputData) {
+    WaveformAnalysisData *analysisData = calloc(1 * sizeof(WaveformAnalysisData), MAX_ROWS);
+    if (!analysisData) {
         perror("malloc failed");
         exit(1);
     }
 
-    // debug for printing out whole table
-    // for (WaveformSample *ptr = &waveData[0]; ptr < &waveData[MAX_ROWS]; ptr++) {
-    //     int rowNum = ptr - &waveData[0];
-    //
-    //     printf("%d, %f, %f, %f, %f, %f, %f, %f, %f\n",
-    //         rowNum,
-    //         ptr->timestamp,
-    //         ptr->phase_A_voltage,
-    //         ptr->phase_B_voltage,
-    //         ptr->phase_C_voltage,
-    //         ptr->line_current,
-    //         ptr->frequency,
-    //         ptr->power_factor,
-    //         ptr->thd_percent);
-    //
-    // }
+    PhaseOutputData *PhaseA = calloc(1 * sizeof(PhaseOutputData), MAX_ROWS);
+    if (!PhaseA) {
+        perror("malloc failed");
+        exit(1);
+    }
+    PhaseOutputData *PhaseB = calloc(1 * sizeof(PhaseOutputData), MAX_ROWS);
+    if (!PhaseB) {
+        perror("malloc failed");
+        exit(1);
+    }
+    PhaseOutputData *PhaseC = calloc(1 * sizeof(PhaseOutputData), MAX_ROWS);
+    if (!PhaseC) {
+        perror("malloc failed");
+        exit(1);
+    }
 
-    WaveformSample *ptr = waveData;
+    for (WaveformSample *ptr = &waveData[0]; ptr < &waveData[MAX_ROWS]; ptr++) {
+        int rowNum = ptr - &waveData[0] + 1;
+        calculateRMS(ptr->phase_A_voltage, PhaseA, rowNum);
+        calculatePeakToPeak2(ptr->phase_A_voltage, PhaseA, rowNum);
 
-    double RMSA = computePhaseRMS(waveData, &ptr->phase_A_voltage);
-    outputData->RMS_phase_A = RMSA;
+        calculateRMS(ptr->phase_B_voltage, PhaseB, rowNum);
+        calculatePeakToPeak2(ptr->phase_B_voltage, PhaseB, rowNum);
 
-    double RMSB = computePhaseRMS(waveData, &ptr->phase_B_voltage);
-    outputData->RMS_phase_B = RMSB;
+        calculateRMS(ptr->phase_C_voltage, PhaseC, rowNum);
+        calculatePeakToPeak2(ptr->phase_C_voltage, PhaseC, rowNum);
+    }
 
-    double RMSC = computePhaseRMS(waveData, &ptr->phase_C_voltage);
-    outputData->RMS_phase_C = RMSC;
+    analysisData->phase_A = *PhaseA;
+    analysisData->phase_B = *PhaseB;
+    analysisData->phase_C = *PhaseC;
 
-    double PTPA = calculatePeakToPeak(waveData, &ptr->phase_A_voltage);
-    outputData->PTP_phase_A = PTPA;
+    free(PhaseA);
+    free(PhaseB);
+    free(PhaseC);
 
-    double PTPB = calculatePeakToPeak(waveData, &ptr->phase_B_voltage);
-    outputData->PTP_phase_B = PTPB;
-
-    double PTPC = calculatePeakToPeak(waveData, &ptr->phase_C_voltage);
-    outputData->PTP_phase_C = PTPC;
-
-
-    return outputData;
+    return analysisData;
 }
 
 

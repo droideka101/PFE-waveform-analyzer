@@ -8,14 +8,14 @@
 #define MAX_ROWS 1000
 
 typedef struct {
-    float timestamp;
-    float phase_A_voltage;
-    float phase_B_voltage;
-    float phase_C_voltage;
-    float line_current;
-    float frequency;
-    float power_factor;
-    float thd_percent;
+    double timestamp;
+    double phase_A_voltage;
+    double phase_B_voltage;
+    double phase_C_voltage;
+    double line_current;
+    double frequency;
+    double power_factor;
+    double thd_percent;
 } WaveformSample;
 
 WaveformSample* read_waveform_from_file(const char* filePath);

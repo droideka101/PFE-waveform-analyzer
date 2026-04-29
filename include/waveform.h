@@ -18,6 +18,21 @@ typedef struct {
     // int toleranceCompliance;
 } AnalysisOutputData;
 
-AnalysisOutputData* AnalysePQ(WaveformSample *waveData);
+typedef struct {
+    double Max;
+    double Min;
+    double PTP;
+    double TotalSquared;
+    double RMS;
+
+} PhaseOutputData;
+
+typedef struct {
+    PhaseOutputData phase_A;
+    PhaseOutputData phase_B;
+    PhaseOutputData phase_C;
+} WaveformAnalysisData;
+
+WaveformAnalysisData* AnalysePQ(WaveformSample *waveData);
 
 #endif //PROJECT_FILE_WAVEFORM_H
