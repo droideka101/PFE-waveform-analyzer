@@ -6,6 +6,8 @@
 #define PROJECT_FILE_WAVEFORM_H
 #include "io.h"
 
+#define volLimit 324.9
+
 typedef struct {
     double max;
     double min;
@@ -14,6 +16,7 @@ typedef struct {
     double RMS;
     double total;
     double DC_offset;
+    double clipping_timestamps[MAX_ROWS];
 
 } PhaseOutputData;
 

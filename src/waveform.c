@@ -35,9 +35,21 @@ void calculatePeakToPeak(double sampleVoltage, PhaseOutputData *Phase, int rowNu
 
 
 void calculateDCOffset(double sampleVoltage, PhaseOutputData *Phase, int rowNum) {
+    /// adds all voltage samples to total, then divides by max rows to find average value (DC offset)
+    /// expected result is 0
+
     Phase->total += sampleVoltage;
     if (rowNum == MAX_ROWS) {
         Phase->DC_offset = Phase->total / MAX_ROWS;
+    }
+}
+
+void detectClipping(double sampleVoltage,double timeStamp, PhaseOutputData *Phase, int rowNum) {
+    /// checks if the absolute value of the sample voltage is above the defined voltage limit
+    /// if it is, adds the timestamp to the clipping timestamps array
+
+    if (fabs(sampleVoltage) >= volLimit) {
+        Phase->clipping_timestamps[rowNum - 1] = timeStamp;
     }
 }
 
@@ -70,14 +82,17 @@ WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
         calculateRMS(ptr->phase_A_voltage, PhaseA, rowNum);
         calculatePeakToPeak(ptr->phase_A_voltage, PhaseA, rowNum);
         calculateDCOffset(ptr->phase_A_voltage, PhaseA, rowNum);
+        detectClipping(ptr->phase_A_voltage, ptr->timestamp, PhaseA, rowNum);
 
         calculateRMS(ptr->phase_B_voltage, PhaseB, rowNum);
         calculatePeakToPeak(ptr->phase_B_voltage, PhaseB, rowNum);
         calculateDCOffset(ptr->phase_B_voltage, PhaseB, rowNum);
+        detectClipping(ptr->phase_B_voltage, ptr->timestamp, PhaseB, rowNum);
 
         calculateRMS(ptr->phase_C_voltage, PhaseC, rowNum);
         calculatePeakToPeak(ptr->phase_C_voltage, PhaseC, rowNum);
         calculateDCOffset(ptr->phase_C_voltage, PhaseC, rowNum);
+        detectClipping(ptr->phase_C_voltage, ptr->timestamp, PhaseC, rowNum);
     }
 
     analysisData->phase_A = *PhaseA;
