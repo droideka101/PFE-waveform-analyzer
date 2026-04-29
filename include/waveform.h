@@ -7,23 +7,13 @@
 #include "io.h"
 
 typedef struct {
-    double RMS_phase_A;
-    double RMS_phase_B;
-    double RMS_phase_C;
-    double PTP_phase_A;
-    double PTP_phase_B;
-    double PTP_phase_C;
-    // int DCOffset;
-    // int clipping;
-    // int toleranceCompliance;
-} AnalysisOutputData;
-
-typedef struct {
-    double Max;
-    double Min;
+    double max;
+    double min;
     double PTP;
-    double TotalSquared;
+    double total_squared;
     double RMS;
+    double total;
+    double DC_offset;
 
 } PhaseOutputData;
 

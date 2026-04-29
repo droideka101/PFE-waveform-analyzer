@@ -11,13 +11,14 @@
 
 WaveformSample* read_waveform_from_file(const char* filePath) {
 
+    // opens file, throws error if any problems occure with reading the data
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         perror("Error opening file");
         return NULL;
     }
 
-
+    // allocates memory for the data, returns error if malloc fails
     WaveformSample *waveData = malloc(MAX_ROWS * sizeof(WaveformSample));
     if (!waveData) {
         perror("malloc failed");
