@@ -28,6 +28,11 @@ int main(void) {
             printf("%lf ", analysisData->phase_A.clipping_timestamps[i]);
         }
     }
+    if (analysisData->phase_A.tolerance_compliance) {
+        printf("\n   Tolerance compliance: True\n");
+    } else {
+        printf("\n   Tolerance compliance: False\n");
+    }
 
     printf("\n\nPhase B:\n   RMS: %lf\n   Peak to peak: %lf\n   DC offset: %lf\n", analysisData->phase_B.RMS, analysisData->phase_B.PTP, analysisData->phase_B.DC_offset);
     printf("   Clipping detected at the following timestamps:\n");
@@ -35,6 +40,11 @@ int main(void) {
         if (analysisData->phase_B.clipping_timestamps[i] != 0) {
             printf("%lf ", analysisData->phase_B.clipping_timestamps[i]);
         }
+    }
+    if (analysisData->phase_B.tolerance_compliance) {
+        printf("\n   Tolerance compliance: True\n");
+    } else {
+        printf("\n   Tolerance compliance: False\n");
     }
 
     printf("\n\nPhase C:\n   RMS: %lf\n   Peak to peak: %lf\n   DC offset: %lf\n", analysisData->phase_C.RMS, analysisData->phase_C.PTP, analysisData->phase_C.DC_offset);
@@ -44,7 +54,11 @@ int main(void) {
             printf("%lf ", analysisData->phase_C.clipping_timestamps[i]);
         }
     }
-
+    if (analysisData->phase_C.tolerance_compliance) {
+        printf("\n   Tolerance compliance: True\n");
+    } else {
+        printf("\n   Tolerance compliance: False\n");
+    }
 
     // frees up memory of left over structs, then exits program
     free (waveData);

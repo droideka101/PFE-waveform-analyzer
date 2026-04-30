@@ -4,9 +4,12 @@
 
 #ifndef PROJECT_FILE_WAVEFORM_H
 #define PROJECT_FILE_WAVEFORM_H
+#include <stdbool.h>
+
 #include "io.h"
 
 #define volLimit 324.9
+#define targetRMS 230
 
 typedef struct {
     double max;
@@ -17,7 +20,7 @@ typedef struct {
     double total;
     double DC_offset;
     double clipping_timestamps[MAX_ROWS];
-
+    bool tolerance_compliance;
 } PhaseOutputData;
 
 typedef struct {

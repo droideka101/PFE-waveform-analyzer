@@ -9,6 +9,7 @@
 #include <math.h>
 
 
+
 void calculateRMS(double sampleVoltage, PhaseOutputData *Phase, int rowNum) {
     /// adds all the voltage samples to TotalSquared after being squared
     /// once the all added, applies the mean and square root to get the RMS value
@@ -53,6 +54,13 @@ void detectClipping(double sampleVoltage,double timeStamp, PhaseOutputData *Phas
     }
 }
 
+void checkToleranceCompliance(PhaseOutputData *Phase) {
+    /// uses boolean logic to check if RMS is within 10% of the target (defined as 230 in header)
+
+    double tolerance = targetRMS * 0.10;
+    Phase->tolerance_compliance = (Phase->RMS >= (targetRMS - tolerance)) && (Phase->RMS <= (targetRMS + tolerance));
+}
+
 WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
 
     WaveformAnalysisData *analysisData = calloc(1 * sizeof(WaveformAnalysisData), MAX_ROWS);
@@ -83,16 +91,19 @@ WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
         calculatePeakToPeak(ptr->phase_A_voltage, PhaseA, rowNum);
         calculateDCOffset(ptr->phase_A_voltage, PhaseA, rowNum);
         detectClipping(ptr->phase_A_voltage, ptr->timestamp, PhaseA, rowNum);
+        checkToleranceCompliance(PhaseA);
 
         calculateRMS(ptr->phase_B_voltage, PhaseB, rowNum);
         calculatePeakToPeak(ptr->phase_B_voltage, PhaseB, rowNum);
         calculateDCOffset(ptr->phase_B_voltage, PhaseB, rowNum);
         detectClipping(ptr->phase_B_voltage, ptr->timestamp, PhaseB, rowNum);
+        checkToleranceCompliance(PhaseB);
 
         calculateRMS(ptr->phase_C_voltage, PhaseC, rowNum);
         calculatePeakToPeak(ptr->phase_C_voltage, PhaseC, rowNum);
         calculateDCOffset(ptr->phase_C_voltage, PhaseC, rowNum);
         detectClipping(ptr->phase_C_voltage, ptr->timestamp, PhaseC, rowNum);
+        checkToleranceCompliance(PhaseC);
     }
 
     analysisData->phase_A = *PhaseA;
