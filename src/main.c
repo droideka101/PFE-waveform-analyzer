@@ -5,22 +5,7 @@
 #include "io.h"
 
 
-int main(void) {
-    //First section handles start menu and taking file name input in command line
-
-    char filePath[256] = "C:/Users/ben/Downloads/power_quality_log.csv";    // hardcoded for testing, comment out for user input
-    printf("Waveform Analyzer start menu\n");
-    printf("enter the path to waveform file\n> \n");
-    //scanf("%255s", filePath);
-
-
-    WaveformSample *waveData = read_waveform_from_file(filePath);   // calls function from io.c to, returns all data in a struct
-
-
-    WaveformAnalysisData *analysisData = AnalysePQ(waveData);   // calls function from waveform.c, returns all required data to output
-
-
-
+void printData(WaveformAnalysisData *analysisData) {
     printf("\nPhase A:\n   RMS: %lf\n   Peak to peak: %lf\n   DC offset: %lf\n", analysisData->phase_A.RMS, analysisData->phase_A.PTP, analysisData->phase_A.DC_offset);
     printf("   Clipping detected at the following timestamps:\n");
     for (int i = 0; i < sizeof(analysisData->phase_A.clipping_timestamps) / sizeof(analysisData->phase_A.clipping_timestamps[0]); i++) {
@@ -59,6 +44,26 @@ int main(void) {
     } else {
         printf("\n   Tolerance compliance: False\n");
     }
+}
+
+int main(void) {
+    //First section handles start menu and taking file name input in command line
+
+    char filePath[256] = "C:/Users/ben/Downloads/power_quality_log.csv";    // hardcoded for testing, comment out for user input
+    printf("Waveform Analyzer start menu\n");
+    printf("enter the path to waveform file\n> \n");
+    //scanf("%255s", filePath);
+
+
+    WaveformSample *waveData = read_waveform_from_file(filePath);   // calls function from io.c to, returns all data in a struct
+
+
+    WaveformAnalysisData *analysisData = AnalysePQ(waveData);   // calls function from waveform.c, returns all required data to output
+
+
+    //printData(analysisData);   // prints the data to the console in a readable format
+
+    output_data_to_file(analysisData);
 
     // frees up memory of left over structs, then exits program
     free (waveData);
