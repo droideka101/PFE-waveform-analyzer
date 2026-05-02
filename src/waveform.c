@@ -85,6 +85,7 @@ WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
         exit(1);
     }
 
+    // only loops through the data once
     for (WaveformSample *ptr = &waveData[0]; ptr < &waveData[MAX_ROWS]; ptr++) {
         int rowNum = ptr - &waveData[0] + 1;
         calculateRMS(ptr->phase_A_voltage, PhaseA, rowNum);
@@ -106,10 +107,12 @@ WaveformAnalysisData* AnalysePQ(WaveformSample *waveData) {
         checkToleranceCompliance(PhaseC);
     }
 
+    // combine phases into one struct to be returned
     analysisData->phase_A = *PhaseA;
     analysisData->phase_B = *PhaseB;
     analysisData->phase_C = *PhaseC;
 
+    // free memory now that it is no longer needed
     free(PhaseA);
     free(PhaseB);
     free(PhaseC);

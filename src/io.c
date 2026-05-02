@@ -11,7 +11,7 @@
 
 WaveformSample* read_waveform_from_file(const char* filePath) {
 
-    // opens file, throws error if any problems occure with reading the data
+    // opens file, throws error if any problems occur with reading the data
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         perror("Error opening file");
