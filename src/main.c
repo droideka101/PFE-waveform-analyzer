@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "waveform.h"
 #include "io.h"
@@ -46,25 +47,21 @@ void printData(WaveformAnalysisData *analysisData) {
     }
 }
 
-int main(void) {
-    //First section handles start menu and taking file name input in command line
-
-    char filePath[256];// = "C:/Users/ben/Downloads/power_quality_log.csv";    // hardcoded for testing, comment out for user input
-    printf("Waveform Analyzer start menu\n");
-    printf("enter the path to waveform file\n> \n");
-    scanf("%255s", filePath);
+int main(int argc, char *argv[]) {
 
 
-    WaveformSample *waveData = read_waveform_from_file(filePath);   // calls function from io.c to, returns all data in a struct
-    printf("\nFile opened successfully\n");
+
+    WaveformSample *waveData = read_waveform_from_file(argv[1]);   // calls function from io.c to, returns all data in a struct
 
 
     WaveformAnalysisData *analysisData = AnalysePQ(waveData);   // calls function from waveform.c, returns all required data to output
-    printf("\nData analysis complete\n");
 
     //printData(analysisData);   // prints the data to the console in a readable format
 
     output_data_to_file(analysisData);
+
+    printf("\nData analysis complete\n");
+
     printf("\nData output to file complete\n");
 
     // frees up memory of left over structs, then exits program
@@ -72,3 +69,4 @@ int main(void) {
     free(analysisData);
     return 0;
 }
+
